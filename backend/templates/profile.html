@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | DeepShield AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>🛡 DeepShield AI</h2>
+
+        <div class="sidebar-menu">
+
+            <ul>
+
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+
+                <li><a href="/image-detection">🖼 Image Detection</a></li>
+
+                <li><a href="/video-detection">🎥 Video Detection</a></li>
+
+                <li><a href="/history">📜 History</a></li>
+
+                <li><a href="/reports">📄 Reports</a></li>
+
+                <li class="active">👤 Profile</li>
+
+                <li><a href="/settings">⚙ Settings</a></li>
+
+            </ul>
+
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <h1>My Profile</h1>
+
+            <div class="user">
+
+                Welcome,
+
+                <span id="username">User</span>
+
+            </div>
+
+        </header>
+
+        <section class="profile-container">
+
+            <div class="profile-card">
+
+                <div class="profile-avatar">
+
+                    👤
+
+                </div>
+
+                <h2 id="profileName">
+
+                    User Name
+
+                </h2>
+
+                <p id="profileEmail">
+
+                    user@email.com
+
+                </p>
+
+                <button class="upload-btn">
+
+                    Change Profile Photo
+
+                </button>
+
+            </div>
+
+            <div class="profile-details">
+
+                <h2>Personal Information</h2>
+
+                <form>
+
+                    <div class="profile-grid">
+
+                        <div>
+
+                            <label>Full Name</label>
+
+                            <input
+                                type="text"
+                                id="fullName">
+
+                        </div>
+
+                        <div>
+
+                            <label>Email</label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                readonly>
+
+                        </div>
+
+                        <div>
+
+                            <label>Phone</label>
+
+                            <input
+                                type="text"
+                                id="phone">
+
+                        </div>
+
+                        <div>
+
+                            <label>Country</label>
+
+                            <input
+                                type="text"
+                                value="India">
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="analyze-btn">
+
+                        Save Changes
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <h3>Total Scans</h3>
+
+                <h1 id="profileTotalScans">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Images</h3>
+
+                <h1 id="profileImages">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Videos</h3>
+
+                <h1 id="profileVideos">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Reports</h3>
+
+                <h1 id="profileReports">0</h1>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+<script src="{{ url_for('static', filename='profile.js') }}"></script>
+
+</body>
+
+</html>

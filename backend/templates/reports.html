@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Reports | DeepShield AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>🛡 DeepShield AI</h2>
+
+        <div class="sidebar-menu">
+
+            <ul>
+
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+
+                <li><a href="/image-detection">🖼 Image Detection</a></li>
+
+                <li><a href="/video-detection">🎥 Video Detection</a></li>
+
+                <li><a href="/history">📜 History</a></li>
+
+                <li class="active">📄 Reports</li>
+
+                <li><a href="/profile">👤 Profile</a></li>
+
+                <li><a href="/settings">⚙ Settings</a></li>
+
+            </ul>
+
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <h1>Detection Report</h1>
+
+            <div class="user">
+
+                Welcome,
+
+                <span id="username">User</span>
+
+            </div>
+
+        </header>
+
+        <!-- Report Summary -->
+
+        <section class="report-summary">
+
+            <div class="summary-card">
+
+                <h3>Prediction</h3>
+
+                <p class="real">✅ Authentic</p>
+
+            </div>
+
+            <div class="summary-card">
+
+                <h3>Confidence</h3>
+
+                <p>98.45%</p>
+
+            </div>
+
+            <div class="summary-card">
+
+                <h3>Risk Level</h3>
+
+                <p class="low">Low</p>
+
+            </div>
+
+            <div class="summary-card">
+
+                <h3>Processing Time</h3>
+
+                <p>2.4 sec</p>
+
+            </div>
+
+        </section>
+
+        <!-- Details -->
+
+        <section class="report-details">
+
+            <div class="report-image">
+
+                <h2>Uploaded Image</h2>
+
+                <div class="image-placeholder">
+
+                    Image Preview
+
+                </div>
+
+            </div>
+
+            <div class="report-info">
+
+                <h2>Detection Information</h2>
+
+                <table>
+
+                    <tr>
+
+                        <td>File Name</td>
+
+                        <td>sample.jpg</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>File Type</td>
+
+                        <td>Image</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Resolution</td>
+
+                        <td>1920 × 1080</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>AI Model</td>
+
+                        <td>XceptionNet</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Analysis Date</td>
+
+                        <td>04 Aug 2026</td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- Heatmap -->
+
+        <section class="heatmap-section">
+
+            <h2>AI Heatmap</h2>
+
+            <div class="heatmap-placeholder">
+
+                Heatmap Visualization
+
+            </div>
+
+        </section>
+
+        <!-- Buttons -->
+
+        <section class="report-buttons">
+
+            <button class="download-btn">
+
+                Download PDF
+
+            </button>
+
+            <button class="print-btn">
+
+                Print Report
+
+            </button>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+<script src="{{ url_for('static', filename='reports.js') }}"></script>
+
+</body>
+
+</html>

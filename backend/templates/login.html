@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | DeepShield AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="login-card">
+
+        <div class="login-header">
+
+            <h1>DeepShield <span>AI</span></h1>
+
+            <p>Welcome Back!</p>
+
+            <small>Login to continue your deepfake detection journey.</small>
+
+        </div>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+
+                <label>Email Address</label>
+
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    required>
+
+            </div>
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    required>
+
+            </div>
+
+            <div class="login-options">
+
+                <label>
+
+                    <input type="checkbox">
+
+                    Remember Me
+
+                </label>
+
+                <a href="/forgot-password">
+
+                    Forgot Password?
+
+                </a>
+
+            </div>
+
+            <button
+                type="submit"
+                class="login-page-btn">
+
+                Login
+
+            </button>
+
+        </form>
+
+        <div class="divider">
+
+            <span>OR</span>
+
+        </div>
+
+        <button class="google-btn">
+
+            Continue with Google
+
+        </button>
+
+        <p class="register-text">
+
+            Don't have an account?
+
+            <a href="/register">
+
+                Create Account
+
+            </a>
+
+        </p>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='login.js') }}"></script>
+
+</body>
+
+</html>

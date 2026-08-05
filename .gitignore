@@ -1,0 +1,33 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Uploads
+backend/uploads/
+
+# Database
+backend/database.db
+
+# VS Code
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# TensorFlow Logs
+logs/
+
+# Temporary Files
+*.log
+
+venv/
+__pycache__/
+*.pyc
+
+backend/models/
+backend/uploads/
+backend/database.db
+
+.vscode/

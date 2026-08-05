@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | DeepShield AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>🛡 DeepShield AI</h2>
+
+        <ul>
+
+            <li class="active">🏠 Dashboard</li>
+
+            <li><a href="/image-detection">🖼 Image Detection</a></li>
+
+            <li><a href="/video-detection">🎥 Video Detection</a></li>
+
+            <li><a href="/history">📜 History</a></li>
+
+            <li><a href="/reports">📄 Reports</a></li>
+
+            <li><a href="/profile">👤 Profile</a></li>
+
+            <li><a href="/settings">⚙ Settings</a></li>
+
+        </ul>
+
+        <button onclick="logout()" class="logout-btn">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <h1>Dashboard</h1>
+
+            <div class="user">
+
+                Welcome,
+                <span id="username">User</span>
+
+            </div>
+
+        </header>
+
+        <!-- Welcome -->
+
+        <section class="welcome">
+
+            <h2>Welcome to DeepShield AI</h2>
+
+            <p>
+
+                Detect deepfake images and videos using Artificial Intelligence.
+
+            </p>
+
+        </section>
+
+        <!-- Statistics -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <h3>Total Scans</h3>
+
+                <h1 id="totalScans">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Images</h3>
+
+                <h1 id="totalImages">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Videos</h3>
+
+                <h1 id="totalVideos">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Deepfakes</h3>
+
+                <h1 id="totalDeepfakes">0</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Accuracy</h3>
+
+                <h1 id="accuracy">0%</h1>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h3>Reports</h3>
+
+                <h1 id="totalReports">0</h1>
+
+            </div>
+
+        </section>
+
+        <!-- Quick Actions -->
+
+        <section class="quick-actions">
+
+            <a href="/image-detection">
+
+                <button>Upload Image</button>
+
+            </a>
+
+            <a href="/video-detection">
+
+                <button>Upload Video</button>
+
+            </a>
+
+            <a href="/reports">
+
+                <button>View Reports</button>
+
+            </a>
+
+        </section>
+
+        <!-- Recent Activity -->
+
+        <section class="recent">
+
+            <h2>Recent Activity</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+
+                        <th>File</th>
+
+                        <th>Result</th>
+
+                        <th>Confidence</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="recentTable">
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+</body>
+
+</html>

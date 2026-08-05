@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard | DeepShield AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+
+<h2>🛡 DeepShield AI</h2>
+
+<ul>
+
+<li class="active">🏠 Admin Dashboard</li>
+
+<li><a href="#">👥 Users</a></li>
+
+<li><a href="#">📊 Analytics</a></li>
+
+<li><a href="#">📜 Detection Logs</a></li>
+
+<li><a href="#">⚙ System Status</a></li>
+
+</ul>
+
+<button class="logout-btn" onclick="logout()">
+
+Logout
+
+</button>
+
+</aside>
+
+<!-- Main -->
+
+<main class="main-content">
+
+<header class="topbar">
+
+<h1>Administrator Panel</h1>
+
+<div class="user">
+
+Admin
+
+</div>
+
+</header>
+
+<section class="stats">
+
+<div class="stat-card">
+
+<h3>Total Users</h3>
+
+<h1>125</h1>
+
+</div>
+
+<div class="stat-card">
+
+<h3>Total Image Scans</h3>
+
+<h1>845</h1>
+
+</div>
+
+<div class="stat-card">
+
+<h3>Total Video Scans</h3>
+
+<h1>423</h1>
+
+</div>
+
+<div class="stat-card">
+
+<h3>Deepfakes Detected</h3>
+
+<h1>78</h1>
+
+</div>
+
+</section>
+
+<section class="recent">
+
+<h2>Recent Detection Logs</h2>
+
+<table>
+
+<tr>
+
+<th>User</th>
+
+<th>File</th>
+
+<th>Result</th>
+
+<th>Date</th>
+
+</tr>
+
+<tr>
+
+<td>Vikas</td>
+
+<td>image01.jpg</td>
+
+<td>Real</td>
+
+<td>Today</td>
+
+</tr>
+
+<tr>
+
+<td>Rahul</td>
+
+<td>video02.mp4</td>
+
+<td>Deepfake</td>
+
+<td>Today</td>
+
+</tr>
+
+<tr>
+
+<td>Aman</td>
+
+<td>image15.png</td>
+
+<td>Real</td>
+
+<td>Yesterday</td>
+
+</tr>
+
+</table>
+
+</section>
+
+<section class="quick-actions">
+
+<button>Manage Users</button>
+
+<button>Detection Reports</button>
+
+<button>System Settings</button>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="dashboard.js"></script>
+
+</body>
+
+</html>

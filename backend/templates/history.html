@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detection History | DeepShield AI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <h2>🛡 DeepShield AI</h2>
+
+        <div class="sidebar-menu">
+
+            <ul>
+
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+
+                <li><a href="/image-detection">🖼 Image Detection</a></li>
+
+                <li><a href="/video-detection">🎥 Video Detection</a></li>
+
+                <li class="active">📜 History</li>
+
+                <li><a href="/reports">📄 Reports</a></li>
+
+                <li><a href="/profile">👤 Profile</a></li>
+
+                <li><a href="/settings">⚙ Settings</a></li>
+
+            </ul>
+
+        </div>
+
+        <button class="logout-btn" onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <h1>Detection History</h1>
+
+            <div class="user">
+
+                Welcome,
+
+                <span id="username">User</span>
+
+            </div>
+
+        </header>
+
+        <section class="history-toolbar">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search file name...">
+
+            <select id="typeFilter">
+
+                <option value="All">All Types</option>
+                <option value="Image">Image</option>
+                <option value="Video">Video</option>
+
+            </select>
+
+            <select id="resultFilter">
+
+                <option value="All">All Results</option>
+                <option value="Real">Real</option>
+                <option value="Deepfake">Deepfake</option>
+
+            </select>
+
+        </section>
+
+        <section class="history-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>File</th>
+
+                        <th>Type</th>
+
+                        <th>Status</th>
+
+                        <th>Confidence</th>
+
+                        <th>Date</th>
+
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyTable">
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='history.js') }}"></script>
+
+</body>
+
+</html>
