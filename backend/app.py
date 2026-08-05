@@ -4,6 +4,8 @@ from flask_cors import CORS
 from auth import auth
 from upload import upload
 
+from flask import send_from_directory
+
 app = Flask(
     __name__,
     template_folder="templates",
@@ -19,6 +21,10 @@ app.register_blueprint(upload, url_prefix="/api")
 # =============================
 # Pages
 # =============================
+
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory("uploads", filename)
 
 @app.route("/")
 def index():

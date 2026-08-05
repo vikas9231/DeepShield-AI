@@ -81,7 +81,7 @@
 
                 <h3>Prediction</h3>
 
-                <p class="real">✅ Authentic</p>
+                <p id="reportPrediction">-</p>
 
             </div>
 
@@ -89,7 +89,7 @@
 
                 <h3>Confidence</h3>
 
-                <p>98.45%</p>
+                <p id="reportConfidence">0%</p>
 
             </div>
 
@@ -97,7 +97,7 @@
 
                 <h3>Risk Level</h3>
 
-                <p class="low">Low</p>
+                <p id="reportRisk">-</p>
 
             </div>
 
@@ -105,7 +105,7 @@
 
                 <h3>Processing Time</h3>
 
-                <p>2.4 sec</p>
+                <p id="processingTime">--</p>
 
             </div>
 
@@ -119,9 +119,19 @@
 
                 <h2>Uploaded Image</h2>
 
-                <div class="image-placeholder">
+                <img
 
-                    Image Preview
+                    id="reportImage"
+
+                    src=""
+
+                    alt="Uploaded File"
+
+                    style="width:100%;border-radius:12px;display:none;">
+
+                <div id="imagePlaceholder">
+
+                        No Preview Available
 
                 </div>
 
@@ -133,11 +143,11 @@
 
                 <table>
 
-                    <tr>
+                    <tr>           
 
                         <td>File Name</td>
 
-                        <td>sample.jpg</td>
+                        <td id="reportFilename">-</td>
 
                     </tr>
 
@@ -145,7 +155,7 @@
 
                         <td>File Type</td>
 
-                        <td>Image</td>
+                        <td id="reportType">-</td>
 
                     </tr>
 
@@ -153,7 +163,7 @@
 
                         <td>Resolution</td>
 
-                        <td>1920 × 1080</td>
+                        <td id="reportResolution">-</td>
 
                     </tr>
 
@@ -161,7 +171,7 @@
 
                         <td>AI Model</td>
 
-                        <td>XceptionNet</td>
+                        <td id="reportModel">CNN Model</td>
 
                     </tr>
 
@@ -169,7 +179,7 @@
 
                         <td>Analysis Date</td>
 
-                        <td>04 Aug 2026</td>
+                        <td id="reportDate">-</td>
 
                     </tr>
 
@@ -185,9 +195,13 @@
 
             <h2>AI Heatmap</h2>
 
-            <div class="heatmap-placeholder">
+            <div
 
-                Heatmap Visualization
+                class="heatmap-placeholder"
+
+                id="heatmap">
+
+                Coming Soon
 
             </div>
 
@@ -197,13 +211,21 @@
 
         <section class="report-buttons">
 
-            <button class="download-btn">
+            <button
+
+                class="download-btn"
+
+                id="downloadPDF">
 
                 Download PDF
 
             </button>
 
-            <button class="print-btn">
+            <button
+
+                class="print-btn"
+
+                id="printReport">
 
                 Print Report
 

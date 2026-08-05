@@ -78,7 +78,7 @@ def upload_image():
 
         }), 400
 
-    if not allowed_image(image.filename):
+    if not allowed_file(image.filename):
 
         return jsonify({
 
@@ -509,5 +509,75 @@ def dashboard(user_id):
         "reports": total_scans,
 
         "accuracy": accuracy
+
+    })
+
+@upload.route("/report/<int:user_id>", methods=["GET"])
+def get_latest_report(user_id):
+
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT *
+        FROM scans
+        WHERE user_id=?
+        ORDER BY id DESC
+        LIMIT 1
+    """, (user_id,))
+
+    row = cursor.fetchone()
+
+    conn.close()
+
+    if row is None:
+
+        return jsonify({
+
+            "success": False,
+
+            "message": "No reports found."
+
+        }), 404
+
+    filename = row["image_name"]
+
+    extension = filename.split(".")[-1].lower()
+
+    if extension in ["mp4", "avi", "mov", "mkv"]:
+
+        media_type = "Video"
+
+    else:
+
+        media_type = "Image"
+
+    return jsonify({
+
+        "success": True,
+
+        "report": {
+
+            "id": row["id"],
+
+            "filename": filename,
+
+            "type": media_type,
+
+            "prediction": row["prediction"],
+
+            "confidence": row["confidence"],
+
+            "risk_level": row["risk_level"],
+
+            "date": row["scan_time"],
+
+            "image": "/uploads/" + filename,
+
+            "model": "CNN Model"
+
+        }
 
     })

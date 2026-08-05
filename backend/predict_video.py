@@ -24,28 +24,41 @@ def predict_video(video_path):
             "prediction": "Error",
             "confidence": 0,
             "raw_prediction": 0,
-            "risk_level": "Unknown"
+            "risk_level": "Unknown",
+            "real_votes": 0,
+            "fake_votes": 0,
+            "frames": 0
 
         }
 
-    predictions = []
+    total_frames = 0
+    analyzed_frames = 0
 
-    frame_count = 0
+    real_votes = 0
+    fake_votes = 0
+
+    probabilities = []
 
     while True:
 
-        ret, frame = cap.read()
+        success, frame = cap.read()
 
-        if not ret:
+        if not success:
 
             break
 
-        frame_count += 1
+        total_frames += 1
 
-        # Analyze every 15th frame
-        if frame_count % 15 != 0:
+        # Analyze every 10th frame
+        if total_frames % 10 != 0:
 
             continue
+
+        analyzed_frames += 1
+
+        # ----------------------------
+        # Preprocess
+        # ----------------------------
 
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -55,38 +68,63 @@ def predict_video(video_path):
 
         frame = np.expand_dims(frame, axis=0)
 
-        pred = float(model.predict(frame, verbose=0)[0][0])
+        prediction = float(model.predict(frame, verbose=0)[0][0])
 
-        predictions.append(pred)
+        print(f"Frame {analyzed_frames}: {prediction:.4f}")
+
+        print(prediction)
+
+        probabilities.append(prediction)
+
+        # Same logic as image detection
+
+        if prediction >= 0.5:
+
+            fake_votes += 1
+
+        else:
+
+            real_votes += 1
 
     cap.release()
 
-    if len(predictions) == 0:
+    if analyzed_frames == 0:
 
         return {
 
             "prediction": "Error",
             "confidence": 0,
             "raw_prediction": 0,
-            "risk_level": "Unknown"
+            "risk_level": "Unknown",
+            "real_votes": 0,
+            "fake_votes": 0,
+            "frames": 0
 
         }
 
-    avg_prediction = np.mean(predictions)
+    # ==========================================
+    # Majority Voting
+    # ==========================================
 
-    if avg_prediction >= 0.5:
+    if fake_votes > real_votes:
 
         prediction = "Deepfake"
 
-        confidence = avg_prediction * 100
+        confidence = (fake_votes / analyzed_frames) * 100
 
     else:
 
         prediction = "Real"
 
-        confidence = (1 - avg_prediction) * 100
+        confidence = (real_votes / analyzed_frames) * 100
 
-    fake_probability = avg_prediction * 100
+    raw_prediction = float(np.mean(probabilities))
+
+    fake_probability = raw_prediction * 100
+
+    # ==========================================
+    # Risk Level
+    # ==========================================
 
     if fake_probability >= 90:
 
@@ -108,14 +146,48 @@ def predict_video(video_path):
 
         risk = "Very Low"
 
+    # ==========================================
+    # Debug
+    # ==========================================
+
+    print("\n================ VIDEO ANALYSIS ================")
+
+    print("Total Frames      :", total_frames)
+
+    print("Frames Analysed   :", analyzed_frames)
+
+    print("Real Votes        :", real_votes)
+
+    print("Fake Votes        :", fake_votes)
+
+    print("Average Prediction:", round(raw_prediction, 4))
+
+    print("Final Result      :", prediction)
+
+    print("Confidence        :", round(confidence, 2))
+
+    print("Risk Level        :", risk)
+
+    print("===============================================\n")
+
+    # ==========================================
+    # Return
+    # ==========================================
+
     return {
 
         "prediction": prediction,
 
         "confidence": round(confidence, 2),
 
-        "raw_prediction": round(avg_prediction, 4),
+        "raw_prediction": round(raw_prediction, 4),
 
-        "risk_level": risk
+        "risk_level": risk,
+
+        "real_votes": real_votes,
+
+        "fake_votes": fake_votes,
+
+        "frames": analyzed_frames
 
     }

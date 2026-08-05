@@ -8,17 +8,7 @@ if (localStorage.getItem("isLoggedIn") !== "true") {
 
 }
 
-// ==========================================
-// Current User
-// ==========================================
-
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-if (currentUser) {
-
-    document.getElementById("username").textContent = currentUser.name;
-
-}
+document.getElementById("username").textContent = currentUser.name;
 
 // ==========================================
 // Elements
@@ -27,11 +17,20 @@ if (currentUser) {
 const videoInput = document.getElementById("videoInput");
 const videoPreview = document.getElementById("videoPreview");
 const videoDropArea = document.getElementById("videoDropArea");
-const progressBar = document.getElementById("progressBar");
+
 const analyzeVideo = document.getElementById("analyzeVideo");
 
+const progressBar = document.getElementById("progressBar");
+
+const videoStatus = document.getElementById("videoStatus");
+const videoConfidence = document.getElementById("videoConfidence");
+const videoFake = document.getElementById("videoFake");
+const videoReal = document.getElementById("videoReal");
+
+let selectedVideo = null;
+
 // ==========================================
-// Browse Video
+// Select Video
 // ==========================================
 
 videoInput.addEventListener("change", function () {
@@ -44,84 +43,46 @@ videoInput.addEventListener("change", function () {
 
 });
 
-// ==========================================
-// Drag & Drop
-// ==========================================
+function loadVideo(file){
 
-videoDropArea.addEventListener("dragover", function (e) {
+    if(!file.type.startsWith("video/")){
 
-    e.preventDefault();
-
-    videoDropArea.style.borderColor = "#22c55e";
-
-});
-
-videoDropArea.addEventListener("dragleave", function () {
-
-    videoDropArea.style.borderColor = "#3b82f6";
-
-});
-
-videoDropArea.addEventListener("drop", function (e) {
-
-    e.preventDefault();
-
-    videoDropArea.style.borderColor = "#3b82f6";
-
-    if (e.dataTransfer.files.length > 0) {
-
-        loadVideo(e.dataTransfer.files[0]);
-
-    }
-
-});
-
-// ==========================================
-// Load Video
-// ==========================================
-
-function loadVideo(file) {
-
-    if (!file.type.startsWith("video/")) {
-
-        alert("Please select a video.");
+        alert("Please choose a video.");
 
         return;
 
     }
 
-    if (file.size > 100 * 1024 * 1024) {
-
-        alert("Maximum video size is 100 MB.");
-
-        return;
-
-    }
+    selectedVideo = file;
 
     videoPreview.src = URL.createObjectURL(file);
 
     videoPreview.style.display = "block";
 
     document.getElementById("videoName").textContent = file.name;
-    document.getElementById("videoSize").textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-    document.getElementById("videoFormat").textContent = file.type;
 
-    videoPreview.onloadedmetadata = function () {
+    document.getElementById("videoSize").textContent =
+        (file.size/(1024*1024)).toFixed(2)+" MB";
+
+    document.getElementById("videoFormat").textContent =
+        file.type;
+
+    videoPreview.onloadedmetadata=function(){
 
         document.getElementById("videoDuration").textContent =
-            Math.floor(videoPreview.duration) + " sec";
+            Math.floor(videoPreview.duration)+" sec";
 
     };
 
 }
 
 // ==========================================
-// Analyze (Demo)
+// Analyze Video
 // ==========================================
 
-analyzeVideo.addEventListener("click", function () {
+analyzeVideo.addEventListener("click", async function () {
 
-    if (videoPreview.src === "") {
+    if (!selectedVideo) {
 
         alert("Please upload a video first.");
 
@@ -130,56 +91,80 @@ analyzeVideo.addEventListener("click", function () {
     }
 
     analyzeVideo.disabled = true;
+
     analyzeVideo.innerHTML = "Analyzing...";
 
-    let progress = 0;
+    progressBar.style.width = "20%";
 
-    progressBar.style.width = "0%";
+    try {
 
-    const interval = setInterval(function () {
+        const formData = new FormData();
 
-        progress += 5;
+        formData.append("video", selectedVideo);
 
-        progressBar.style.width = progress + "%";
+        formData.append("user_id", currentUser.id);
 
-        if (progress >= 100) {
+        const response = await fetch("/api/upload-video", {
 
-            clearInterval(interval);
+            method: "POST",
 
-            showResult();
+            body: formData
+
+        });
+
+        progressBar.style.width = "80%";
+
+        const result = await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(result.message);
 
         }
 
-    }, 120);
+        progressBar.style.width = "100%";
+
+        videoStatus.innerHTML = result.prediction;
+
+        videoConfidence.innerHTML = result.confidence + "%";
+
+        videoFake.innerHTML =
+            (result.raw_prediction * 100).toFixed(2) + "%";
+
+        videoReal.innerHTML =
+            ((1 - result.raw_prediction) * 100).toFixed(2) + "%";
+
+        if (result.prediction === "Deepfake") {
+
+            videoStatus.style.color = "#ef4444";
+
+        }
+
+        else {
+
+            videoStatus.style.color = "#22c55e";
+
+        }
+
+        videoStatus.innerHTML +=
+            `<br><small>Risk: ${result.risk_level}</small>`;
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message || "Server Error");
+
+    }
+
+    finally {
+
+        analyzeVideo.disabled = false;
+
+        analyzeVideo.innerHTML = "Analyze Video";
+
+    }
 
 });
-
-// ==========================================
-// Demo Result
-// ==========================================
-
-function showResult() {
-
-    const confidence = (95 + Math.random() * 5).toFixed(2);
-
-    const fake = Math.floor(Math.random() * 40);
-
-    const real = 100 - fake;
-
-    document.getElementById("videoStatus").innerHTML =
-        fake > 50 ? "⚠ Deepfake" : "✅ Authentic";
-
-    document.getElementById("videoConfidence").innerHTML =
-        confidence + "%";
-
-    document.getElementById("videoFake").innerHTML =
-        fake + "%";
-
-    document.getElementById("videoReal").innerHTML =
-        real + "%";
-
-    analyzeVideo.innerHTML = "Analyze Again";
-
-    analyzeVideo.disabled = false;
-
-}
