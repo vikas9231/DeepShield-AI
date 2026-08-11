@@ -7,25 +7,41 @@ import sqlite3
 from predict import predict_image
 from predict_video import predict_video
 
+
+# ==========================================
+# Blueprint
+# ==========================================
+
 upload = Blueprint("upload", __name__)
 
-DATABASE = "database.db"
 
-UPLOAD_FOLDER = "uploads"
+# ==========================================
+# Paths
+# ==========================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+DATABASE = os.path.join(BASE_DIR, "database.db")
+
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+
+# Create uploads folder if it doesn't exist
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 # ==========================================
 # Allowed Extensions
 # ==========================================
 
-IMAGE_EXTENSIONS = {
+ALLOWED_IMAGE_EXTENSIONS = {
     "jpg",
     "jpeg",
     "png"
 }
 
-VIDEO_EXTENSIONS = {
+ALLOWED_VIDEO_EXTENSIONS = {
     "mp4",
     "avi",
     "mov",
@@ -33,310 +49,473 @@ VIDEO_EXTENSIONS = {
 }
 
 
-def allowed_image(filename):
+# ==========================================
+# Check Image Extension
+# ==========================================
 
-    return (
-        "." in filename and
-        filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
-    )
+def allowed_file(filename):
 
+    if not filename:
+        return False
 
-def allowed_video(filename):
+    if "." not in filename:
+        return False
 
-    return (
-        "." in filename and
-        filename.rsplit(".", 1)[1].lower() in VIDEO_EXTENSIONS
-    )
+    extension = filename.rsplit(".", 1)[1].lower()
+
+    return extension in ALLOWED_IMAGE_EXTENSIONS
 
 
 # ==========================================
-# Upload Image
+# Check Video Extension
+# ==========================================
+
+def allowed_video(filename):
+
+    if not filename:
+        return False
+
+    if "." not in filename:
+        return False
+
+    extension = filename.rsplit(".", 1)[1].lower()
+
+    return extension in ALLOWED_VIDEO_EXTENSIONS
+
+
+# ==========================================
+# Upload & Detect Image
 # ==========================================
 
 @upload.route("/upload-image", methods=["POST"])
 def upload_image():
 
-    if "image" not in request.files:
+    try:
 
-        return jsonify({
+        # --------------------------------------
+        # Check Image
+        # --------------------------------------
 
-            "success": False,
+        if "image" not in request.files:
 
-            "message": "No image selected."
+            return jsonify({
+                "success": False,
+                "message": "No image selected."
+            }), 400
 
-        }), 400
+        image = request.files["image"]
 
-    image = request.files["image"]
+        if image.filename == "":
 
-    if image.filename == "":
+            return jsonify({
+                "success": False,
+                "message": "Please choose an image."
+            }), 400
 
-        return jsonify({
+        # --------------------------------------
+        # Validate Image
+        # --------------------------------------
 
-            "success": False,
+        if not allowed_file(image.filename):
 
-            "message": "Please choose an image."
+            return jsonify({
+                "success": False,
+                "message": "Only JPG, JPEG and PNG images are allowed."
+            }), 400
 
-        }), 400
+        # --------------------------------------
+        # User ID
+        # --------------------------------------
 
-    if not allowed_file(image.filename):
+        user_id = request.form.get("user_id")
 
-        return jsonify({
+        if not user_id:
 
-            "success": False,
+            return jsonify({
+                "success": False,
+                "message": "User ID is missing."
+            }), 400
 
-            "message": "Only JPG, JPEG and PNG images are allowed."
+        # --------------------------------------
+        # Secure Filename
+        # --------------------------------------
 
-        }), 400
+        filename = secure_filename(image.filename)
 
-    filename = secure_filename(image.filename)
+        if not filename:
 
-    image_path = os.path.join(UPLOAD_FOLDER, filename)
+            return jsonify({
+                "success": False,
+                "message": "Invalid filename."
+            }), 400
 
-    image.save(image_path)
+        # --------------------------------------
+        # Save Image
+        # --------------------------------------
 
-    result = predict_image(image_path)
-
-    user_id = request.form.get("user_id", 1)
-
-    conn = sqlite3.connect(DATABASE)
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-
-        INSERT INTO scans(
-
-            user_id,
-            image_name,
-            prediction,
-            confidence,
-            raw_prediction,
-            risk_level
-
+        image_path = os.path.join(
+            UPLOAD_FOLDER,
+            filename
         )
 
-        VALUES(?,?,?,?,?,?)
+        image.save(image_path)
 
-    """,(
+        # --------------------------------------
+        # AI Prediction
+        # --------------------------------------
 
-        user_id,
+        result = predict_image(image_path)
 
-        filename,
+        # --------------------------------------
+        # Save Scan
+        # --------------------------------------
 
-        result["prediction"],
+        conn = sqlite3.connect(DATABASE)
 
-        result["confidence"],
+        cursor = conn.cursor()
 
-        result["raw_prediction"],
+        cursor.execute("""
+            INSERT INTO scans (
+                user_id,
+                image_name,
+                prediction,
+                confidence,
+                raw_prediction,
+                risk_level
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
 
-        result["risk_level"]
+            int(user_id),
 
-    ))
+            filename,
 
-    conn.commit()
+            result["prediction"],
 
-    scan_id = cursor.lastrowid
+            result["confidence"],
 
-    conn.close()
+            result["raw_prediction"],
 
-    return jsonify({
+            result["risk_level"]
 
-        "success": True,
+        ))
 
-        "scan_id": scan_id,
+        conn.commit()
 
-        "filename": filename,
+        scan_id = cursor.lastrowid
 
-        "prediction": result["prediction"],
+        conn.close()
 
-        "confidence": result["confidence"],
+        print("\n========== IMAGE SCAN ==========")
+        print("User ID     :", user_id)
+        print("Filename    :", filename)
+        print("Prediction  :", result["prediction"])
+        print("Confidence  :", result["confidence"])
+        print("Scan ID     :", scan_id)
+        print("================================\n")
 
-        "raw_prediction": result["raw_prediction"],
+        # --------------------------------------
+        # Response
+        # --------------------------------------
 
-        "risk_level": result["risk_level"]
+        return jsonify({
 
-    })
+            "success": True,
+
+            "scan_id": scan_id,
+
+            "filename": filename,
+
+            "prediction": result["prediction"],
+
+            "confidence": result["confidence"],
+
+            "raw_prediction": result["raw_prediction"],
+
+            "risk_level": result["risk_level"]
+
+        }), 200
+
+    except Exception as e:
+
+        print("\nIMAGE UPLOAD ERROR:")
+        print(e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
+        }), 500
+
 
 # ==========================================
-# Upload Video
+# Upload & Detect Video
 # ==========================================
 
 @upload.route("/upload-video", methods=["POST"])
 def upload_video():
 
-    if "video" not in request.files:
+    try:
 
-        return jsonify({
+        # --------------------------------------
+        # Check Video
+        # --------------------------------------
 
-            "success": False,
+        if "video" not in request.files:
 
-            "message": "No video selected."
+            return jsonify({
+                "success": False,
+                "message": "No video selected."
+            }), 400
 
-        }), 400
+        video = request.files["video"]
 
-    video = request.files["video"]
+        if video.filename == "":
 
-    if video.filename == "":
+            return jsonify({
+                "success": False,
+                "message": "Please choose a video."
+            }), 400
 
-        return jsonify({
+        # --------------------------------------
+        # Validate Video
+        # --------------------------------------
 
-            "success": False,
+        if not allowed_video(video.filename):
 
-            "message": "Please choose a video."
+            return jsonify({
+                "success": False,
+                "message": (
+                    "Only MP4, AVI, MOV and MKV videos "
+                    "are allowed."
+                )
+            }), 400
 
-        }), 400
+        # --------------------------------------
+        # User ID
+        # --------------------------------------
 
-    if not allowed_video(video.filename):
+        user_id = request.form.get("user_id")
 
-        return jsonify({
+        if not user_id:
 
-            "success": False,
+            return jsonify({
+                "success": False,
+                "message": "User ID is missing."
+            }), 400
 
-            "message": "Only MP4, AVI, MOV and MKV videos are allowed."
+        # --------------------------------------
+        # Secure Filename
+        # --------------------------------------
 
-        }), 400
+        filename = secure_filename(video.filename)
 
-    filename = secure_filename(video.filename)
+        if not filename:
 
-    video_path = os.path.join(UPLOAD_FOLDER, filename)
+            return jsonify({
+                "success": False,
+                "message": "Invalid filename."
+            }), 400
 
-    video.save(video_path)
+        # --------------------------------------
+        # Save Video
+        # --------------------------------------
 
-    # AI Prediction
-    result = predict_video(video_path)
-
-    user_id = request.form.get("user_id", 1)
-
-    conn = sqlite3.connect(DATABASE)
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-
-        INSERT INTO scans(
-
-            user_id,
-            image_name,
-            prediction,
-            confidence,
-            raw_prediction,
-            risk_level
-
+        video_path = os.path.join(
+            UPLOAD_FOLDER,
+            filename
         )
 
-        VALUES(?,?,?,?,?,?)
+        video.save(video_path)
 
-    """,(
+        # --------------------------------------
+        # AI Prediction
+        # --------------------------------------
 
-        user_id,
+        result = predict_video(video_path)
 
-        filename,
+        # --------------------------------------
+        # Save Scan
+        # --------------------------------------
 
-        result["prediction"],
+        conn = sqlite3.connect(DATABASE)
 
-        result["confidence"],
+        cursor = conn.cursor()
 
-        result["raw_prediction"],
+        cursor.execute("""
+            INSERT INTO scans (
+                user_id,
+                image_name,
+                prediction,
+                confidence,
+                raw_prediction,
+                risk_level
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
 
-        result["risk_level"]
+            int(user_id),
 
-    ))
+            filename,
 
-    conn.commit()
+            result["prediction"],
 
-    scan_id = cursor.lastrowid
+            result["confidence"],
 
-    conn.close()
+            result["raw_prediction"],
 
-    return jsonify({
+            result["risk_level"]
 
-        "success": True,
+        ))
 
-        "scan_id": scan_id,
+        conn.commit()
 
-        "filename": filename,
+        scan_id = cursor.lastrowid
 
-        "prediction": result["prediction"],
+        conn.close()
 
-        "confidence": result["confidence"],
+        print("\n========== VIDEO SCAN ==========")
+        print("User ID     :", user_id)
+        print("Filename    :", filename)
+        print("Prediction  :", result["prediction"])
+        print("Confidence  :", result["confidence"])
+        print("Scan ID     :", scan_id)
+        print("================================\n")
 
-        "raw_prediction": result["raw_prediction"],
+        # --------------------------------------
+        # Response
+        # --------------------------------------
 
-        "risk_level": result["risk_level"]
+        return jsonify({
 
-    })
+            "success": True,
+
+            "scan_id": scan_id,
+
+            "filename": filename,
+
+            "prediction": result["prediction"],
+
+            "confidence": result["confidence"],
+
+            "raw_prediction": result["raw_prediction"],
+
+            "risk_level": result["risk_level"]
+
+        }), 200
+
+    except Exception as e:
+
+        print("\nVIDEO UPLOAD ERROR:")
+        print(e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
+        }), 500
 
 
 # ==========================================
-# Scan History
+# Get User Scan History
 # ==========================================
 
 @upload.route("/history/<int:user_id>", methods=["GET"])
 def get_history(user_id):
 
-    conn = sqlite3.connect(DATABASE)
+    try:
 
-    conn.row_factory = sqlite3.Row
+        conn = sqlite3.connect(DATABASE)
 
-    cursor = conn.cursor()
+        conn.row_factory = sqlite3.Row
 
-    cursor.execute("""
+        cursor = conn.cursor()
 
-        SELECT *
+        cursor.execute("""
+            SELECT
+                id,
+                image_name,
+                prediction,
+                confidence,
+                raw_prediction,
+                risk_level,
+                scan_time
+            FROM scans
+            WHERE user_id = ?
+            ORDER BY scan_time DESC
+        """, (user_id,))
 
-        FROM scans
+        scans = cursor.fetchall()
 
-        WHERE user_id=?
+        conn.close()
 
-        ORDER BY scan_time DESC
+        history = []
 
-    """,(user_id,))
+        for scan in scans:
 
-    rows = cursor.fetchall()
+            filename = scan["image_name"]
 
-    conn.close()
+            extension = ""
 
-    history = []
+            if "." in filename:
 
-    for row in rows:
+                extension = (
+                    filename.rsplit(".", 1)[1]
+                    .lower()
+                )
 
-        filename = row["image_name"]
+            if extension in ALLOWED_VIDEO_EXTENSIONS:
 
-        extension = filename.split(".")[-1].lower()
+                file_type = "Video"
 
-        if extension in VIDEO_EXTENSIONS:
+            else:
 
-            media_type = "Video"
-        else:
-            media_type = "Image"
+                file_type = "Image"
 
-        history.append({
+            history.append({
 
-            "id": row["id"],
+                "id": scan["id"],
 
-            "filename": filename,
+                "filename": filename,
 
-            "type": media_type,
+                "type": file_type,
 
-            "prediction": row["prediction"],
+                "prediction": scan["prediction"],
 
-            "confidence": row["confidence"],
+                "confidence": scan["confidence"],
 
-            "raw_prediction": row["raw_prediction"],
+                "raw_prediction": scan["raw_prediction"],
 
-            "risk_level": row["risk_level"],
+                "risk_level": scan["risk_level"],
 
-            "date": row["scan_time"]
+                "date": scan["scan_time"]
 
-        })
+            })
 
-    return jsonify({
+        return jsonify({
 
-        "success": True,
+            "success": True,
 
-        "history": history
+            "history": history
 
-    })
+        }), 200
+
+    except Exception as e:
+
+        print("\nHISTORY ERROR:")
+        print(e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
+        }), 500
 
 
 # ==========================================
@@ -346,238 +525,398 @@ def get_history(user_id):
 @upload.route("/history/<int:scan_id>", methods=["DELETE"])
 def delete_scan(scan_id):
 
-    conn = sqlite3.connect(DATABASE)
+    try:
 
-    cursor = conn.cursor()
+        conn = sqlite3.connect(DATABASE)
 
-    cursor.execute(
+        cursor = conn.cursor()
 
-        "DELETE FROM scans WHERE id=?",
+        # --------------------------------------
+        # Get File Before Deleting DB Record
+        # --------------------------------------
 
-        (scan_id,)
+        cursor.execute("""
+            SELECT image_name
+            FROM scans
+            WHERE id = ?
+        """, (scan_id,))
 
-    )
+        scan = cursor.fetchone()
 
-    conn.commit()
+        if scan is None:
 
-    conn.close()
+            conn.close()
 
-    return jsonify({
+            return jsonify({
 
-        "success": True,
+                "success": False,
 
-        "message": "Scan deleted successfully."
+                "message": "Scan not found."
 
-    })
+            }), 404
+
+        filename = scan[0]
+
+        # --------------------------------------
+        # Delete Database Record
+        # --------------------------------------
+
+        cursor.execute(
+            "DELETE FROM scans WHERE id = ?",
+            (scan_id,)
+        )
+
+        conn.commit()
+
+        conn.close()
+
+        # --------------------------------------
+        # Delete Uploaded File
+        # --------------------------------------
+
+        file_path = os.path.join(
+            UPLOAD_FOLDER,
+            filename
+        )
+
+        if os.path.exists(file_path):
+
+            os.remove(file_path)
+
+        return jsonify({
+
+            "success": True,
+
+            "message": "Scan deleted successfully."
+
+        }), 200
+
+    except Exception as e:
+
+        print("\nDELETE SCAN ERROR:")
+        print(e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
+        }), 500
+
 
 # ==========================================
-# Dashboard Recent Activity
+# Recent Dashboard Activity
 # ==========================================
 
-@upload.route("/dashboard/recent/<int:user_id>", methods=["GET"])
+@upload.route(
+    "/dashboard/recent/<int:user_id>",
+    methods=["GET"]
+)
 def dashboard_recent(user_id):
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    try:
 
-    cursor = conn.cursor()
+        conn = sqlite3.connect(DATABASE)
 
-    cursor.execute("""
+        conn.row_factory = sqlite3.Row
 
-        SELECT
+        cursor = conn.cursor()
 
-            image_name,
-            prediction,
-            confidence,
-            scan_time
+        cursor.execute("""
+            SELECT
+                image_name,
+                prediction,
+                confidence,
+                scan_time
+            FROM scans
+            WHERE user_id = ?
+            ORDER BY id DESC
+            LIMIT 5
+        """, (user_id,))
 
-        FROM scans
+        rows = cursor.fetchall()
 
-        WHERE user_id=?
+        conn.close()
 
-        ORDER BY id DESC
+        recent = []
 
-        LIMIT 5
+        for row in rows:
 
-    """, (user_id,))
+            recent.append({
 
-    rows = cursor.fetchall()
+                "filename": row["image_name"],
 
-    conn.close()
+                "prediction": row["prediction"],
 
-    recent = []
+                "confidence": row["confidence"],
 
-    for row in rows:
+                "date": row["scan_time"]
 
-        recent.append({
+            })
 
-            "filename": row["image_name"],
+        return jsonify({
 
-            "prediction": row["prediction"],
+            "success": True,
 
-            "confidence": row["confidence"],
+            "recent": recent
 
-            "date": row["scan_time"]
+        }), 200
 
-        })
+    except Exception as e:
 
-    return jsonify({
+        print("\nRECENT ACTIVITY ERROR:")
+        print(e)
 
-        "success": True,
+        return jsonify({
 
-        "recent": recent
+            "success": False,
 
-    })
+            "message": str(e)
+
+        }), 500
 
 
 # ==========================================
 # Dashboard Statistics
 # ==========================================
 
-@upload.route("/dashboard/<int:user_id>", methods=["GET"])
+@upload.route(
+    "/dashboard/<int:user_id>",
+    methods=["GET"]
+)
 def dashboard(user_id):
 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    try:
 
-    cursor = conn.cursor()
+        conn = sqlite3.connect(DATABASE)
 
-    cursor.execute("""
+        cursor = conn.cursor()
 
-        SELECT
+        # --------------------------------------
+        # Total Scans
+        # --------------------------------------
 
-            image_name,
-            prediction,
-            confidence
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM scans
+            WHERE user_id = ?
+        """, (user_id,))
 
-        FROM scans
+        total_scans = cursor.fetchone()[0]
 
-        WHERE user_id=?
+        # --------------------------------------
+        # Images
+        # --------------------------------------
 
-    """,(user_id,))
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM scans
+            WHERE user_id = ?
+            AND (
+                image_name LIKE '%.jpg'
+                OR image_name LIKE '%.jpeg'
+                OR image_name LIKE '%.png'
+            )
+        """, (user_id,))
 
-    rows = cursor.fetchall()
+        images = cursor.fetchone()[0]
 
-    conn.close()
+        # --------------------------------------
+        # Videos
+        # --------------------------------------
 
-    total_scans = len(rows)
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM scans
+            WHERE user_id = ?
+            AND (
+                image_name LIKE '%.mp4'
+                OR image_name LIKE '%.avi'
+                OR image_name LIKE '%.mov'
+                OR image_name LIKE '%.mkv'
+            )
+        """, (user_id,))
 
-    images = 0
+        videos = cursor.fetchone()[0]
 
-    videos = 0
+        # --------------------------------------
+        # Deepfakes
+        # --------------------------------------
 
-    deepfakes = 0
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM scans
+            WHERE user_id = ?
+            AND prediction = 'Deepfake'
+        """, (user_id,))
 
-    confidence_sum = 0
+        deepfakes = cursor.fetchone()[0]
 
-    for row in rows:
+        # --------------------------------------
+        # Reports
+        # --------------------------------------
 
-        filename = row["image_name"].lower()
+        reports = total_scans
 
-        if filename.endswith((".mp4", ".avi", ".mov", ".mkv")):
+        # --------------------------------------
+        # Average Confidence
+        # --------------------------------------
 
-            videos += 1
+        cursor.execute("""
+            SELECT AVG(confidence)
+            FROM scans
+            WHERE user_id = ?
+        """, (user_id,))
 
-        else:
+        avg_confidence = cursor.fetchone()[0]
 
-            images += 1
+        accuracy = (
+            round(avg_confidence, 2)
+            if avg_confidence is not None
+            else 0
+        )
 
-        if row["prediction"] == "Deepfake":
+        conn.close()
 
-            deepfakes += 1
+        return jsonify({
 
-        confidence_sum += row["confidence"]
+            "success": True,
 
-    accuracy = 0
+            "total_scans": total_scans,
 
-    if total_scans > 0:
+            "images": images,
 
-        accuracy = round(confidence_sum / total_scans, 2)
+            "videos": videos,
 
-    return jsonify({
+            "deepfakes": deepfakes,
 
-        "success": True,
+            "reports": reports,
 
-        "total_scans": total_scans,
+            "accuracy": accuracy
 
-        "images": images,
+        }), 200
 
-        "videos": videos,
+    except Exception as e:
 
-        "deepfakes": deepfakes,
-
-        "reports": total_scans,
-
-        "accuracy": accuracy
-
-    })
-
-@upload.route("/report/<int:user_id>", methods=["GET"])
-def get_latest_report(user_id):
-
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT *
-        FROM scans
-        WHERE user_id=?
-        ORDER BY id DESC
-        LIMIT 1
-    """, (user_id,))
-
-    row = cursor.fetchone()
-
-    conn.close()
-
-    if row is None:
+        print("\nDASHBOARD ERROR:")
+        print(e)
 
         return jsonify({
 
             "success": False,
 
-            "message": "No reports found."
+            "message": str(e)
 
-        }), 404
+        }), 500
 
-    filename = row["image_name"]
 
-    extension = filename.split(".")[-1].lower()
+# ==========================================
+# Get Latest Report
+# ==========================================
 
-    if extension in ["mp4", "avi", "mov", "mkv"]:
+@upload.route(
+    "/report/<int:user_id>",
+    methods=["GET"]
+)
+def get_report(user_id):
 
-        media_type = "Video"
+    try:
 
-    else:
+        conn = sqlite3.connect(DATABASE)
 
-        media_type = "Image"
+        conn.row_factory = sqlite3.Row
 
-    return jsonify({
+        cursor = conn.cursor()
 
-        "success": True,
+        cursor.execute("""
+            SELECT
+                id,
+                image_name,
+                prediction,
+                confidence,
+                raw_prediction,
+                risk_level,
+                scan_time
+            FROM scans
+            WHERE user_id = ?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (user_id,))
 
-        "report": {
+        scan = cursor.fetchone()
 
-            "id": row["id"],
+        conn.close()
 
-            "filename": filename,
+        if scan is None:
 
-            "type": media_type,
+            return jsonify({
 
-            "prediction": row["prediction"],
+                "success": False,
 
-            "confidence": row["confidence"],
+                "message": "No reports found."
 
-            "risk_level": row["risk_level"],
+            }), 404
 
-            "date": row["scan_time"],
+        filename = scan["image_name"]
 
-            "image": "/uploads/" + filename,
+        extension = ""
 
-            "model": "CNN Model"
+        if "." in filename:
 
-        }
+            extension = (
+                filename.rsplit(".", 1)[1]
+                .lower()
+            )
 
-    })
+        if extension in ALLOWED_VIDEO_EXTENSIONS:
+
+            file_type = "Video"
+
+        else:
+
+            file_type = "Image"
+
+        return jsonify({
+
+            "success": True,
+
+            "report": {
+
+                "id": scan["id"],
+
+                "filename": filename,
+
+                "type": file_type,
+
+                "prediction": scan["prediction"],
+
+                "confidence": scan["confidence"],
+
+                "raw_prediction": scan["raw_prediction"],
+
+                "risk_level": scan["risk_level"],
+
+                "date": scan["scan_time"],
+
+                "model": "CNN Model",
+
+                "resolution": "-"
+
+            }
+
+        }), 200
+
+    except Exception as e:
+
+        print("\nREPORT ERROR:")
+        print(e)
+
+        return jsonify({
+
+            "success": False,
+
+            "message": str(e)
+
+        }), 500
+    
