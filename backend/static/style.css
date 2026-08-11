@@ -2582,3 +2582,413 @@ width:100%;
 }
 
 }
+
+/* ==========================================
+   GLOBAL RESPONSIVE DESIGN
+   ========================================== */
+
+html,
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* ==========================================
+   TABLET
+   ========================================== */
+
+@media (max-width: 900px) {
+
+    .main-content {
+        padding: 25px;
+        width: 100%;
+    }
+
+    .navbar {
+        width: 94%;
+        padding: 15px 20px;
+    }
+
+    .nav-links {
+        gap: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero {
+        width: 94%;
+    }
+
+    .contact-section {
+        grid-template-columns: 1fr;
+    }
+
+    .report-details {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 768px) {
+
+    /* ---------- Navbar ---------- */
+
+    .navbar {
+        width: 94%;
+        margin: 10px auto;
+        padding: 15px;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .logo {
+        font-size: 23px;
+    }
+
+    .nav-links {
+        width: 100%;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .nav-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .login-btn,
+    .signup-btn {
+        padding: 9px 16px;
+    }
+
+
+    /* ---------- Hero ---------- */
+
+    .hero {
+        width: 92%;
+        min-height: auto;
+        padding: 50px 0;
+    }
+
+    .hero-left h1 {
+        font-size: 36px;
+        line-height: 45px;
+    }
+
+    .hero-left p {
+        font-size: 15px;
+        line-height: 26px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+    .hero-right {
+        margin-top: 30px;
+    }
+
+    .image-box {
+        height: 280px;
+    }
+
+
+    /* ---------- Dashboard ---------- */
+
+    .dashboard {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 18px 15px;
+    }
+
+    .sidebar h2 {
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+    .sidebar-menu ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .sidebar ul li {
+        margin: 0;
+    }
+
+    .sidebar ul li a,
+    .sidebar ul li.active {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .logout-btn {
+        margin-top: 15px;
+        padding: 12px;
+    }
+
+    .main-content {
+        padding: 18px 15px;
+    }
+
+
+    /* ---------- Topbar ---------- */
+
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .topbar h1 {
+        font-size: 27px;
+    }
+
+    .user {
+        width: 100%;
+        text-align: center;
+    }
+
+
+    /* ---------- Welcome ---------- */
+
+    .welcome {
+        padding: 25px;
+    }
+
+    .welcome h2 {
+        font-size: 25px;
+    }
+
+    .welcome p {
+        font-size: 14px;
+    }
+
+
+    /* ---------- Cards ---------- */
+
+    .stats,
+    .result-grid,
+    .report-summary {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card,
+    .result-box,
+    .summary-card {
+        padding: 20px;
+    }
+
+
+    /* ---------- Quick Actions ---------- */
+
+    .quick-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .quick-actions button {
+        width: 100%;
+    }
+
+
+    /* ---------- Upload ---------- */
+
+    .upload-card,
+    .preview-card,
+    .result-card,
+    .history-card,
+    .report-image,
+    .report-info,
+    .heatmap-section,
+    .settings-card,
+    .profile-card,
+    .profile-details {
+        padding: 20px;
+    }
+
+    .upload-box {
+        padding: 35px 15px;
+    }
+
+    .upload-icon {
+        font-size: 45px;
+    }
+
+
+    /* ---------- Video ---------- */
+
+    #videoPreview {
+        max-height: 300px;
+    }
+
+
+    /* ---------- Tables ---------- */
+
+    .recent,
+    .history-card,
+    .report-info {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 600px;
+    }
+
+
+    /* ---------- Reports ---------- */
+
+    .report-details {
+        grid-template-columns: 1fr;
+    }
+
+    .image-placeholder {
+        height: 250px;
+    }
+
+    .heatmap-placeholder {
+        height: 220px;
+    }
+
+    .report-buttons {
+        flex-direction: column;
+    }
+
+    .download-btn,
+    .print-btn {
+        width: 100%;
+    }
+
+
+    /* ---------- Profile ---------- */
+
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* ---------- Settings ---------- */
+
+    .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .setting-row input[type="password"],
+    .setting-row select {
+        width: 100%;
+    }
+
+
+    /* ---------- Login ---------- */
+
+    .login-container {
+        padding: 20px;
+    }
+
+    .login-card {
+        width: 100%;
+        padding: 25px;
+    }
+}
+
+
+/* ==========================================
+   SMALL MOBILE
+   ========================================== */
+
+@media (max-width: 480px) {
+
+    .page-hero {
+        padding: 50px 6%;
+    }
+
+    .page-hero h1 {
+        font-size: 34px;
+    }
+
+    .features,
+    .ai,
+    .technology,
+    .workflow,
+    .advantages,
+    .pricing,
+    .faq,
+    .contact-section,
+    .map-section,
+    .social-section,
+    .cta {
+        padding-left: 6%;
+        padding-right: 6%;
+    }
+
+    .sidebar-menu ul {
+        flex-direction: column;
+    }
+
+    .sidebar ul li a,
+    .sidebar ul li.active {
+        text-align: center;
+        width: 100%;
+    }
+
+    .topbar h1 {
+        font-size: 24px;
+    }
+
+    .welcome h2 {
+        font-size: 22px;
+    }
+
+    .stat-card h1 {
+        font-size: 32px;
+    }
+
+    .upload-btn,
+    .analyze-btn {
+        width: 100%;
+    }
+
+    .login-card {
+        padding: 20px;
+    }
+}

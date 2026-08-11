@@ -5,15 +5,24 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>DeepShield AI</title>
 
     <!-- Google Font -->
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 
 </head>
 
@@ -31,80 +40,60 @@
 
         </div>
 
+
         <ul class="nav-links">
 
             <li>
-
                 <a href="/" class="active">
-
                     Home
-
                 </a>
-
             </li>
 
             <li>
-
                 <a href="#">
-
                     Features
-
                 </a>
-
             </li>
 
             <li>
-
                 <a href="#">
-
                     How It Works
-
                 </a>
-
             </li>
 
             <li>
-
                 <a href="#">
-
                     Pricing
-
                 </a>
-
             </li>
 
             <li>
-
                 <a href="#">
-
                     Contact
-
                 </a>
-
             </li>
 
         </ul>
 
+
         <div class="nav-buttons">
 
-            <a href="/login">
-
+            <a href="/admin-login">
                 <button class="login-btn">
-
-                    Login
-
+                    🔐 Admin
                 </button>
+            </a>
 
+            <a href="/login">
+                <button class="login-btn">
+                    Login
+                </button>
             </a>
 
             <a href="/register">
-
                 <button class="primary-btn">
-
                     Create Free Account
-
                 </button>
-
             </a>
 
         </div>
@@ -112,6 +101,7 @@
     </nav>
 
 </header>
+
 
 <!-- ================= HERO SECTION ================= -->
 
@@ -123,46 +113,47 @@
 
             Detect Deepfake Images &
 
-            <span>Videos Instantly</span>
+            <span>
+                Videos Instantly
+            </span>
 
         </h1>
 
+
         <p>
 
-            AI-powered cybersecurity platform that helps identify manipulated images and videos with high accuracy and confidence.
+            AI-powered cybersecurity platform that helps identify
+            manipulated images and videos with high accuracy and confidence.
 
         </p>
+
 
         <div class="buttons">
 
             <a href="/login">
 
                 <button class="primary-btn">
-
                     Upload Media
-
                 </button>
 
             </a>
 
+
             <button class="secondary-btn">
-
                 Learn More
-
             </button>
 
         </div>
 
     </div>
 
+
     <div class="hero-right">
 
         <div class="image-box">
 
             <h2>
-
                 AI Illustration
-
             </h2>
 
         </div>
@@ -171,7 +162,10 @@
 
 </section>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
 
 </body>
 

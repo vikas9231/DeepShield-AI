@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | DeepShield AI</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-login-container {
+            width: 100%;
+            max-width: 430px;
+            padding: 20px;
+        }
+
+        .admin-login-card {
+            padding: 40px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .admin-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-logo h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .admin-logo p {
+            margin-top: 8px;
+            color: #777;
+        }
+
+        .admin-form-group {
+            margin-bottom: 20px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 500;
+        }
+
+        .admin-form-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .admin-login-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            background: #111827;
+            color: white;
+        }
+
+        .admin-login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .admin-message {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        @media (max-width: 480px) {
+
+            .admin-login-card {
+                padding: 25px;
+            }
+
+            .admin-logo h1 {
+                font-size: 24px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="admin-login-container">
+
+        <div class="admin-login-card">
+
+            <div class="admin-logo">
+
+                <h1>🛡 DeepShield AI</h1>
+
+                <p>Administrator Login</p>
+
+            </div>
+
+            <form id="adminLoginForm">
+
+                <div class="admin-form-group">
+
+                    <label for="email">
+                        Admin Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter admin email"
+                        required
+                    >
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter admin password"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="admin-login-btn"
+                    id="loginButton"
+                >
+                    Login as Administrator
+                </button>
+
+                <div
+                    class="admin-message"
+                    id="adminMessage"
+                ></div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const form = document.getElementById("adminLoginForm");
+        const message = document.getElementById("adminMessage");
+        const button = document.getElementById("loginButton");
+
+        form.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            message.textContent = "";
+            button.disabled = true;
+            button.textContent = "Logging in...";
+
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value;
+
+            try {
+
+                const response = await fetch(
+                    "/api/admin/login",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (data.success) {
+
+                    window.location.href =
+                        "/admin-dashboard";
+
+                } else {
+
+                    message.textContent =
+                        data.message || "Login failed.";
+
+                    message.style.color = "red";
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.textContent =
+                    "Unable to connect to server.";
+
+                message.style.color = "red";
+
+            } finally {
+
+                button.disabled = false;
+                button.textContent =
+                    "Login as Administrator";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
